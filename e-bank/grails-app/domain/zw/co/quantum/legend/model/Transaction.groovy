@@ -13,6 +13,7 @@ class Transaction {
 	String destinationAccountType
 	String destinationAccountClass	//Destination Entity Name
 	String paymentRef
+	PaymentType paymentType
 	String type
 	String narrative
 	String gLCode
@@ -39,6 +40,7 @@ class Transaction {
 		destinationAccountType maxSize: 50
 		destinationAccountClass maxSize: 60
 		paymentRef maxSize: 30
+		paymentType nullable: true
 		type inList: [
 			'PRINCIPAL',
 			'INTEREST',
@@ -47,7 +49,8 @@ class Transaction {
 			'INSTALLMENT',
 			'ADJUSTMENT',
 			'DEPOSIT',
-			'WITHDRAWAL'
+			'WITHDRAWAL',
+			'PAYMENT'
 		]
 		narrative maxSize: 120
 		gLCode nullable: false

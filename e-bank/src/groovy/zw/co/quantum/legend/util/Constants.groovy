@@ -2,6 +2,8 @@ package zw.co.quantum.legend.util
 
 class Constants {
 	
+	static final String BRANCH_TYPE_HEAD_OFFICE = 'HO'
+	
 	//Response Codes
 	static final String RESPONSE_TYPE_SUCCESS = 'SUCCESSFUL'
 	static final String RESPONSE_TYPE_FAILURE = 'FAILED'
@@ -68,7 +70,8 @@ class Constants {
 	static final String ACCOUNT_TYPE_SAVINGS = 'SAVINGS'
 	static final String ACCOUNT_TYPE_CURRENT = 'CURRENT'
 	static final String ACCOUNT_TYPE_LOAN_FUNDING = 'LOAN FUNDING'
-
+	static final String ACCOUNT_TYPE_BRANCH_CASH = 'BRANCH CASH'
+	
 	//Tx Statuses
 	static final String TX_STATUS_DRAFT = 'DRAFT'
 	static final String TX_STATUS_SUCCESSFUL = 'SUCCESSFUL'

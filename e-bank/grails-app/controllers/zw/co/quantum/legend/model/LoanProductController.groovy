@@ -14,8 +14,8 @@ class LoanProductController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [loanProductInstanceList: LoanProduct.list(params), loanProductInstanceTotal: LoanProduct.count()]
+//        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+//        [loanProductInstanceList: LoanProduct.list(params), loanProductInstanceTotal: LoanProduct.count()]
     }
 
     def create = {
@@ -107,95 +107,31 @@ class LoanProductController {
         }
     }
 	
+	def search() {
+		
+		def loanProductList = LoanProduct.withCriteria {
+			
+			if (params.'category.id') {
+				eq('category.id', params.'category.id'.toLong())
+			}
+			if (params.interestRateType) {
+				eq('interestRateType', params.interestRateType)
+			}
+			if (params.canWaiveInterest) {
+				eq('canWaiveInterestOnLoanRepayment', params.canWaiveInterest.toBoolean())
+			}
+		}
+			
+		println loanProductList?.size()
+		
+		if (loanProductList) {
+			flash.message = "${loanProductList.size} result(s) found"
+		} else {
+			flash.message = "No results found"
+		}
+			
+		render template:"listbody", model:[loanProductInstanceList: loanProductList, loanProductInstanceTotal: loanProductList?.size()]
+
+	}
 	
-	def list_m = {
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		[loanProductInstanceList: LoanProduct.list(params), loanProductInstanceTotal: LoanProduct.count()]
-	}
-
-	def create_m = {
-		def loanProductInstance = new LoanProduct()
-		loanProductInstance.properties = params
-		return [loanProductInstance: loanProductInstance]
-	}
-
-	def save_m = {
-		def loanProductInstance = new LoanProduct(params)
-		if (loanProductInstance.save(flush: true)) {
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'loanProduct.label', default: 'LoanProduct'), loanProductInstance.id])}"
-			redirect(action: "show_m", id: loanProductInstance.id)
-		}
-		else {
-			render(view: "create_m", model: [loanProductInstance: loanProductInstance])
-		}
-	}
-
-	def show_m = {
-		def loanProductInstance = LoanProduct.get(params.id)
-		if (!loanProductInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'loanProduct.label', default: 'LoanProduct'), params.id])}"
-			redirect(action: "list_m")
-		}
-		else {
-			[loanProductInstance: loanProductInstance]
-		}
-	}
-
-	def edit_m = {
-		def loanProductInstance = LoanProduct.get(params.id)
-		if (!loanProductInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'loanProduct.label', default: 'LoanProduct'), params.id])}"
-			redirect(action: "list_m")
-		}
-		else {
-			return [loanProductInstance: loanProductInstance]
-		}
-	}
-
-	def update_m = {
-		def loanProductInstance = LoanProduct.get(params.id)
-		if (loanProductInstance) {
-			if (params.version) {
-				def version = params.version.toLong()
-				if (loanProductInstance.version > version) {
-					
-					loanProductInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'loanProduct.label', default: 'LoanProduct')] as Object[], "Another user has updated this LoanProduct while you were editing")
-					render(view: "edit_m", model: [loanProductInstance: loanProductInstance])
-					return
-				}
-			}
-			loanProductInstance.properties = params
-			if (!loanProductInstance.hasErrors() && loanProductInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'loanProduct.label', default: 'LoanProduct'), loanProductInstance.id])}"
-				redirect(action: "show_m", id: loanProductInstance.id)
-			}
-			else {
-				render(view: "edit_m", model: [loanProductInstance: loanProductInstance])
-			}
-		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'loanProduct.label', default: 'LoanProduct'), params.id])}"
-			redirect(action: "list")
-		}
-	}
-
-	def delete_m = {
-		def loanProductInstance = LoanProduct.get(params.id)
-		if (loanProductInstance) {
-			try {
-				loanProductInstance.delete(flush: true)
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'loanProduct.label', default: 'LoanProduct'), params.id])}"
-				redirect(action: "list_m")
-			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'loanProduct.label', default: 'LoanProduct'), params.id])}"
-				redirect(action: "show_m", id: params.id)
-			}
-		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'loanProduct.label', default: 'LoanProduct'), params.id])}"
-			redirect(action: "list_m")
-		}
-	}
-
 }

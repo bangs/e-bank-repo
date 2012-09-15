@@ -453,6 +453,15 @@ class AccountService {
 			}
 			
 			def sourceAccount = SystemAccount.findByType(Constants.ACCOUNT_TYPE_LOAN_FUNDING)
+			
+			if (!sourceAccount) {
+				return new Response(
+					Constants.RESPONSE_TYPE_FAILURE,
+					"Loan funding account is not configured. Transaction aborted.",
+					loanAccount
+				)
+			}
+			
 			def targetAccount = loanAccount
 			def amount = loanAccount.amount
 			def txType = Constants.TX_TYPE_PRINCIPAL
@@ -502,5 +511,106 @@ class AccountService {
 		
 	}
 	
+	Response postPayment(LoanAccount loanAccount, Date transactionDate, BigDecimal amount, String modeOfPayment, String receiptNo) {
+		
+		try {		
+		
+			def sourceAccount = SystemAccount.findByTypeAndBranch(Constants.ACCOUNT_TYPE_BRANCH_CASH, loanAccount.branch)
+			
+			if (!sourceAccount) {
+				return new Response(
+					Constants.RESPONSE_TYPE_FAILURE,
+					"Branch cash account is not configured. Transaction aborted.",
+					loanAccount
+				)
+			}
+			
+			def targetAccount = loanAccount
+			def txType = Constants.TX_TYPE_INSTALLMENT
+			def paymentRef = receiptNo
+			def narrative = modeOfPayment
+			def valueDate = transactionDate
+			
+			Response resp = transactionService.postTransaction(sourceAccount, targetAccount, amount, txType, paymentRef, narrative, valueDate)
+			
+			if (!resp.isSuccess()) {
+				return new Response (
+					Constants.RESPONSE_TYPE_FAILURE,
+					resp.message,
+					loanAccount
+				)
+			}
+					
+			return new Response(
+				Constants.RESPONSE_TYPE_SUCCESS,
+				"Payment captured successfully.",
+				loanAccount
+			)
+			
+		} catch (Exception e) {
+			
+			e.printStackTrace(System.out)
+		
+			return new Response(
+				Constants.RESPONSE_TYPE_FAILURE,
+				"Error occured during payment posting",
+				loanAccount
+			)
+			
+			
+		}
+	
+	}
+	
+	Response postAdjustment(String sourceAccountNumber, String targetAccountNumber, BigDecimal amount, Date transactionDate, String narrative) {
+		
+		try {
+			
+			def txType = Constants.TX_TYPE_ADJUSTMENT
+			def valueDate = transactionDate
+			def paymentRef = ""
+			
+			def sourceAccount = FinancialAccount.findByAccountNumber(sourceAccountNumber)
+			def targetAccount = FinancialAccount.findByAccountNumber(targetAccountNumber)
+			
+			if (!(sourceAccount && targetAccount)) {
+				return new Response(
+					Constants.RESPONSE_TYPE_FAILURE,
+					"Source/Target account not found.",
+					sourceAccountNumber
+				)
+				
+			}
+			
+			Response resp = transactionService.postTransaction(sourceAccount, targetAccount, amount, txType, paymentRef, narrative, valueDate)
+			
+			if (!resp.isSuccess()) {
+				return new Response (
+					Constants.RESPONSE_TYPE_FAILURE,
+					resp.message,
+					sourceAccountNumber
+				)
+			}
+					
+			return new Response(
+				Constants.RESPONSE_TYPE_SUCCESS,
+				"Adjustment captured successfully.",
+				sourceAccountNumber
+			)
+			
+		} catch (Exception e) {
+			
+			e.printStackTrace(System.out)
+		
+			return new Response(
+				Constants.RESPONSE_TYPE_FAILURE,
+				"Error occured during adjustment posting",
+				sourceAccountNumber
+			)
+			
+			
+		}
+	
+	}
 	
 }

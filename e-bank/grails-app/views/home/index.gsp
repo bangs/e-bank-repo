@@ -41,6 +41,7 @@
 				<ul>
 					<li>Welcome, <leg:currentUser field="firstName"/> <leg:currentUser field="lastName"/> </li>
 					<li>Last login: <leg:currentUser field="lastLoginDate" /></li>
+					<li>Logout? Click <g:remoteLink controller="logout">here</g:remoteLink></li>
 				</ul>
 			</div>
 		</div>

@@ -190,5 +190,32 @@ class LoanAccountController {
 		
 	}
 	
+	def applyPayment() {
+		
+		[ loanAccountInstance: LoanAccount.get(params.id) ]
+		
+	}
+	
+	def postPayment() {
+		
+		def loanAccountInstance = LoanAccount.get(params.id)
+		
+		Date transactionDate = params.transactionDate
+		
+		Response resp = accountService.postPayment(loanAccountInstance, transactionDate, 
+														params.amount.toBigDecimal(), params.paymentType, params.receiptNo)
+		
+		flash.message = resp.message
+		
+		if (resp.isSuccess()) {
+			render(view:'show', model: [ loanAccountInstance: loanAccountInstance ])
+		} else {
+			loanAccountInstance = (LoanAccount) resp.principal
+			render(view:'applyPayment', model: [ loanAccountInstance: loanAccountInstance ])
+			return
+		}
+						
+	}
+	
 	
 }

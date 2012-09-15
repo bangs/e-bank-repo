@@ -2,12 +2,15 @@ package zw.co.quantum.legend.model
 
 import zw.co.quantum.legend.auth.User;
 import zw.co.quantum.legend.util.Constants;
+import zw.co.quantum.legend.util.Response;
 
 class FinancialAccountController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def springSecurityService
+	
+	def accountService
 	
     def index = {
         redirect(action: "list", params: params)
@@ -131,6 +134,28 @@ class FinancialAccountController {
 		flash.message = approveList? "${approveList.size()} result(s) found." : "No results found."
 		
 		[ financialAccountInstanceList: approveList ]
+		
+	}
+	
+	def applyAdjustment() {
+		
+	}
+	
+	def postAdjustment() {
+		
+		Date transactionDate = params.transactionDate
+		
+		Response resp = accountService.postAdjustment(params.debitAccount, params.creditAccount, 
+														params.amount.toBigInteger(), transactionDate, params.narrative)
+		
+		flash.message = resp.message
+		
+		if (resp.isSuccess()) {
+			render(view:'applyAdjustment', model: [ : ])
+		} else {
+			redirect(controller:"home")
+		}
+						
 		
 	}
 

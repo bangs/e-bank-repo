@@ -9,7 +9,12 @@ class SystemAccount extends FinancialAccount {
     }
     
 	static constraints = {
-		type inList: [ 'LOAN FUNDING' ], maxSize: 30
+		type inList: [ 
+			'LOAN FUNDING',
+			'BRANCH CASH'	
+		], 
+		
+		maxSize: 30
     }
 	
 	def getAccountType() {

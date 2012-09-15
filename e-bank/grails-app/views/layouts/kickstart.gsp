@@ -118,7 +118,8 @@
 					<g:if test="${ params.controller == 'loanAccount' 
 									&& (params.action == 'show' 
 											|| params.action == 'repaymentSchedule' 
-											|| params.action == 'transactionHistory')
+											|| params.action == 'transactionHistory'
+											|| params.action == 'applyPayment')
 								}">
 						<li class="${ params.action == 'show' ? 'active' : '' }">
 							<g:link action="show" id="${loanAccountInstance.id}">Show Loan Account</g:link>
@@ -128,6 +129,9 @@
 						</li>
 						<li class="${ params.action == 'transactionHistory' ? 'active' : '' }">
 							<g:link action="transactionHistory" id="${loanAccountInstance.id}">Transaction History</g:link>
+						</li>
+						<li class="${ params.action == 'applyPayment' ? 'active' : '' }">
+							<g:link action="applyPayment" id="${loanAccountInstance.id}">Apply Payment</g:link>
 						</li>
 					</g:if>
 				

@@ -20,6 +20,8 @@
 			
 				<th><g:message code="posting.transaction.label" default="Reference" /></th>
 				
+				<g:sortableColumn property="transaction.type" title="${message(code: 'posting.transaction.type.label', default: 'Transaction Type')}" />
+				
 				<g:sortableColumn property="narrative" title="${message(code: 'posting.narrative.label', default: 'Narrative')}" />
 												
 				<g:sortableColumn property="amount" title="${message(code: 'posting.amount.label', default: 'Amount')}" />
@@ -37,6 +39,8 @@
 				<td><g:link action="show" id="${postingInstance.id}"><g:formatDate date="${postingInstance.dateCreated}" format="dd-MM-yyyy"/></g:link></td>
 			
 				<td>${fieldValue(bean: postingInstance, field: "transaction")}</td>
+				
+				<td>${ postingInstance?.transaction?.type }</td>
 						
 				<td>${fieldValue(bean: postingInstance, field: "narrative")}</td>
 			

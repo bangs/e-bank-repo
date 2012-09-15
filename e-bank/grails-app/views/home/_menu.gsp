@@ -86,6 +86,9 @@
 	<li class="controller">
 		<g:link controller="savingsAccount">Savings Accounts</g:link>
 	</li>
+	<li class="controller">
+		<g:link controller="financialAccount" action="applyAdjustment">Make Adjustment</g:link>
+	</li>
 					
 </sec:ifAnyGranted>
 

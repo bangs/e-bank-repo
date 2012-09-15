@@ -13,8 +13,8 @@ class SystemAccountController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [systemAccountInstanceList: SystemAccount.list(params), systemAccountInstanceTotal: SystemAccount.count()]
+//        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+//        [systemAccountInstanceList: SystemAccount.list(params), systemAccountInstanceTotal: SystemAccount.count()]
     }
 
     def create = {
@@ -146,5 +146,32 @@ class SystemAccountController {
 
 		render template: template, model: [:]
 		
+	}
+	
+	def search() {
+		
+		def systemAccountList = SystemAccount.withCriteria {
+			
+			if (params.'branch.id') {
+				eq('branch.id', params.'branch.id'.toLong())
+			}
+			if (params.type) {
+				eq('type', params.type)
+			}
+			if (params.accountNumber) {
+				eq('accountNumber', params.accountNumber)
+			}
+		}
+			
+		println systemAccountList?.size()
+		
+		if (systemAccountList) {
+			flash.message = "${systemAccountList.size} result(s) found"
+		} else {
+			flash.message = "No results found"
+		}
+			
+		render template:"listbody", model:[systemAccountInstanceList: systemAccountList, systemAccountInstanceTotal: systemAccountList?.size()]
+
 	}
 }
