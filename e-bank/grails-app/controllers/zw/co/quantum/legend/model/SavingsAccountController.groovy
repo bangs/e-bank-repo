@@ -16,8 +16,8 @@ class SavingsAccountController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [savingsAccountInstanceList: SavingsAccount.list(params), savingsAccountInstanceTotal: SavingsAccount.count()]
+//        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+//        [savingsAccountInstanceList: SavingsAccount.list(params), savingsAccountInstanceTotal: SavingsAccount.count()]
     }
 
     def create = {
@@ -131,5 +131,34 @@ class SavingsAccountController {
 		}
 	}
 	
+	def search() {
+		
+		def savingsAccountList = SavingsAccount.withCriteria {
+			
+			if (params.'branch.id') {
+				eq('branch.id', params.'branch.id'.toLong())
+			}
+			if (params.type) {
+				eq('type', params.type)
+			}
+			if (params.accountNumber) {
+				eq('accountNumber', params.accountNumber)
+			}
+			if (params.accountName) {
+				ilike('accountName', "%${params.accountName}%")
+			}
+		}
+			
+		println savingsAccountList?.size()
+		
+		if (savingsAccountList) {
+			flash.message = "${savingsAccountList.size} result(s) found"
+		} else {
+			flash.message = "No results found"
+		}
+			
+		render template:"listbody", model:[savingsAccountInstanceList: savingsAccountList, savingsAccountInstanceTotal: savingsAccountList?.size()]
 
+	}
+	
 }

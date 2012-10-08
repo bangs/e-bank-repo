@@ -36,7 +36,7 @@
 		<g:each in="${postingInstanceList}" status="i" var="postingInstance">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			
-				<td><g:link action="show" id="${postingInstance.id}"><g:formatDate date="${postingInstance.dateCreated}" format="dd-MM-yyyy"/></g:link></td>
+				<td><g:formatDate date="${postingInstance.dateCreated}" format="dd-MM-yyyy"/></td>
 			
 				<td>${fieldValue(bean: postingInstance, field: "transaction")}</td>
 				
@@ -44,11 +44,11 @@
 						
 				<td>${fieldValue(bean: postingInstance, field: "narrative")}</td>
 			
-				<td>${ Math.abs(postingInstance?.amount) }</td>
+				<td>${postingInstance?.amount}</td>
 			
 				<td>${ Math.abs(postingInstance?.balance) }</td>
 			
-				<td>${ fieldValue(bean: postingInstance, field: "type") }</td>
+				<td>${ postingInstance?.balance < 0 ? 'DR' : 'CR' }</td>
 			
 			</tr>
 		</g:each>

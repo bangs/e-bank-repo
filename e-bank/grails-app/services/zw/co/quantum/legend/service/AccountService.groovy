@@ -573,11 +573,20 @@ class AccountService {
 			def sourceAccount = FinancialAccount.findByAccountNumber(sourceAccountNumber)
 			def targetAccount = FinancialAccount.findByAccountNumber(targetAccountNumber)
 			
-			if (!(sourceAccount && targetAccount)) {
+			if (!sourceAccount) {
 				return new Response(
 					Constants.RESPONSE_TYPE_FAILURE,
-					"Source/Target account not found.",
+					"Source account [${sourceAccountNumber}] not found.",
 					sourceAccountNumber
+				)
+				
+			}
+			
+			if (!targetAccount) {
+				return new Response(
+					Constants.RESPONSE_TYPE_FAILURE,
+					"Target account [${targetAccountNumber}] not found.",
+					targetAccountNumber
 				)
 				
 			}

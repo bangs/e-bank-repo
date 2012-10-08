@@ -13,8 +13,8 @@ class ClientGroupController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [clientGroupInstanceList: ClientGroup.list(params), clientGroupInstanceTotal: ClientGroup.count()]
+//        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+//        [clientGroupInstanceList: ClientGroup.list(params), clientGroupInstanceTotal: ClientGroup.count()]
     }
 
     def create = {
@@ -213,5 +213,33 @@ class ClientGroupController {
 		redirect(controller:'financialAccount', action:'create')
 		
 	}
+	
+	def search() {
+		
+		def clientGroupList = ClientGroup.withCriteria {
+			
+			if (params.'branch.id') {
+				eq('branch.id', params.'branch.id'.toLong())
+			}
+			if (params.type) {
+				eq('type', 'GROUP')
+			}
+			if (params.name) {
+				ilike('name', "%${params.name}%")
+			}
+		}
+			
+		println clientGroupList?.size()
+		
+		if (clientGroupList) {
+			flash.message = "${clientGroupList.size} result(s) found"
+		} else {
+			flash.message = "No results found"
+		}
+			
+		render template:"listbody", model:[clientGroupInstanceList: clientGroupList, clientGroupInstanceTotal: clientGroupList?.size()]
+
+	}
+	
 
 }

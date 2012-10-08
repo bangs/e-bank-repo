@@ -13,8 +13,8 @@ class CorporateClientController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [corporateClientInstanceList: CorporateClient.list(params), corporateClientInstanceTotal: CorporateClient.count()]
+//        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+//        [corporateClientInstanceList: CorporateClient.list(params), corporateClientInstanceTotal: CorporateClient.count()]
     }
 
     def create = {
@@ -211,5 +211,33 @@ class CorporateClientController {
 		redirect(controller:'financialAccount', action:'create')
 		
 	}
+	
+	def search() {
+		
+		def corporateClientList = CorporateClient.withCriteria {
+			
+			if (params.'branch.id') {
+				eq('branch.id', params.'branch.id'.toLong())
+			}
+			if (params.type) {
+				eq('type', 'CORPORATE')
+			}
+			if (params.name) {
+				ilike('name', "%${params.name}%")
+			}
+		}
+			
+		println corporateClientList?.size()
+		
+		if (corporateClientList) {
+			flash.message = "${corporateClientList.size} result(s) found"
+		} else {
+			flash.message = "No results found"
+		}
+			
+		render template:"listbody", model:[corporateClientInstanceList: corporateClientList, corporateClientInstanceTotal: corporateClientList?.size()]
+
+	}
+	
 
 }

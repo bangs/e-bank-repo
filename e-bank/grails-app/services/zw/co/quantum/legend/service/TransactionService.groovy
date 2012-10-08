@@ -130,7 +130,7 @@ class TransactionService {
 			narrative: transaction.narrative,
 			type: Constants.POSTING_TYPE_DR,
 			amount: transaction.amount,
-			balance: FinancialAccount.findByAccountNumber(transaction.sourceAccountNo).getBalance()	+ transaction.amount
+			balance: FinancialAccount.findByAccountNumber(transaction.sourceAccountNo).getBalance()	- transaction.amount
 		)
 					
 		if (!debitEntry.save()) {

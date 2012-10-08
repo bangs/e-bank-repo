@@ -41,7 +41,7 @@ abstract class FinancialAccount {
 	
 	def getBalance() {
 		
-		def latestPosting = Posting.findByAccountNumber(accountNumber, [order:'desc'])
+		def latestPosting = Posting.findByAccountNumber(accountNumber, [sort:'dateCreated', order:'desc'])
 		
 		if (latestPosting) {
 			return latestPosting.balance

@@ -19,8 +19,8 @@ class LoanAccountController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [loanAccountInstanceList: LoanAccount.list(params), loanAccountInstanceTotal: LoanAccount.count()]
+//        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+//        [loanAccountInstanceList: LoanAccount.list(params), loanAccountInstanceTotal: LoanAccount.count()]
     }
 
     def create = {
@@ -208,13 +208,43 @@ class LoanAccountController {
 		flash.message = resp.message
 		
 		if (resp.isSuccess()) {
-			render(view:'show', model: [ loanAccountInstance: loanAccountInstance ])
+			redirect(action:'show', id: loanAccountInstance.id )
 		} else {
 			loanAccountInstance = (LoanAccount) resp.principal
 			render(view:'applyPayment', model: [ loanAccountInstance: loanAccountInstance ])
 			return
 		}
 						
+	}
+	
+	def search() {
+		
+		def loanAccountList = LoanAccount.withCriteria {
+			
+			if (params.'branch.id') {
+				eq('branch.id', params.'branch.id'.toLong())
+			}
+			if (params.type) {
+				eq('type', params.type)
+			}
+			if (params.accountNumber) {
+				eq('accountNumber', params.accountNumber)
+			}
+			if (params.accountName) {
+				ilike('accountName', "%${params.accountName}%")
+			}
+		}
+			
+		println loanAccountList?.size()
+		
+		if (loanAccountList) {
+			flash.message = "${loanAccountList.size} result(s) found"
+		} else {
+			flash.message = "No results found"
+		}
+			
+		render template:"listbody", model:[loanAccountInstanceList: loanAccountList, loanAccountInstanceTotal: loanAccountList?.size()]
+
 	}
 	
 	

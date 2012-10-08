@@ -14,8 +14,8 @@ class IndividualClientController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [individualClientInstanceList: IndividualClient.list(params), individualClientInstanceTotal: IndividualClient.count()]
+//        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+//        [individualClientInstanceList: IndividualClient.list(params), individualClientInstanceTotal: IndividualClient.count()]
     }
 
     def create = {
@@ -122,5 +122,36 @@ class IndividualClientController {
 		redirect(controller:'financialAccount', action:'create')
 		
 	}
+	
+	def search() {
+		
+		def individualClientList = IndividualClient.withCriteria {
+			
+			if (params.'branch.id') {
+				eq('branch.id', params.'branch.id'.toLong())
+			}
+			if (params.type) {
+				eq('type', 'INDIVIDUAL')
+			}
+			if (params.lastName) {
+				ilike('lastName', "%${params.lastName}%")
+			}
+			if (params.firstName) {
+				ilike('firstName', "%${params.firstName}%")
+			}
+		}
+			
+		println individualClientList?.size()
+		
+		if (individualClientList) {
+			flash.message = "${individualClientList.size} result(s) found"
+		} else {
+			flash.message = "No results found"
+		}
+			
+		render template:"listbody", model:[individualClientInstanceList: individualClientList, individualClientInstanceTotal: individualClientList?.size()]
+
+	}
+	
 
 }
