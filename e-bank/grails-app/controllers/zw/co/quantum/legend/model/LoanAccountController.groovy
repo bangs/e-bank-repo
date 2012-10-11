@@ -200,19 +200,33 @@ class LoanAccountController {
 		
 		def loanAccountInstance = LoanAccount.get(params.id)
 		
-		Date transactionDate = params.transactionDate
-		
-		Response resp = accountService.postPayment(loanAccountInstance, transactionDate, 
-														params.amount.toBigDecimal(), params.paymentType, params.receiptNo)
-		
-		flash.message = resp.message
-		
-		if (resp.isSuccess()) {
-			redirect(action:'show', id: loanAccountInstance.id )
-		} else {
-			loanAccountInstance = (LoanAccount) resp.principal
-			render(view:'applyPayment', model: [ loanAccountInstance: loanAccountInstance ])
-			return
+		try {
+			
+			Date transactionDate = params.transactionDate
+					
+			if (!params.amount) {
+				flash.message = 'Amount is not valid'
+				redirect(action:'applyPayment', id: params.id)
+				return
+			}
+			
+			Response resp = accountService.postPayment(loanAccountInstance, transactionDate, 
+															params.amount?.toBigDecimal(), params.paymentType, params.receiptNo)
+			
+			flash.message = resp.message
+			
+			if (resp.isSuccess()) {
+				redirect(action:'show', id: loanAccountInstance.id )
+			} else {
+				loanAccountInstance = (LoanAccount) resp.principal
+				redirect(action:'applyPayment', id: params.id)
+				return
+			}
+			
+		} catch (Exception e) {
+			flash.message = 'Error occured. One or more of the values you entered is/are invalid'
+			redirect(action:'applyPayment', id: params.id)
+			return		
 		}
 						
 	}

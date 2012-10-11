@@ -1,10 +1,11 @@
-<section id="list" class="first">
 <h4>Search Results</h4>
 <div class="messages">
 	<g:if test="${flash.message}">
 		<div class="message" role="status">${flash.message}</div>
 	</g:if>
 </div>		
+
+<section id="list" class="first">
 
 	<table class="table table-bordered">
 		<thead>

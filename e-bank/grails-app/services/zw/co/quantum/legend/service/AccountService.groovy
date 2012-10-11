@@ -622,4 +622,144 @@ class AccountService {
 	
 	}
 	
+	Response performTransaction(FinancialAccount subjectAccount, Date transactionDate, BigDecimal amount, String modeOfPayment, String transactionType) {
+		
+		try {
+		
+			System.out.println("@@ subjectAccount: " + subjectAccount);
+			
+			System.out.println("@@ Performing a " + transactionType);
+			
+			if (Constants.TX_TYPE_DEPOSIT.equals(transactionType)) {
+				
+				return this.postDeposit(subjectAccount, transactionDate, amount, modeOfPayment);
+				
+			} else if(Constants.TX_TYPE_WITHDRAWAL.equals(transactionType)) {
+			
+				return this.postWithdrawal(subjectAccount, transactionDate, amount, modeOfPayment);
+			
+			} else {
+			
+				return new Response(
+					Constants.RESPONSE_TYPE_FAILURE,
+					"Error: Transaction type is invalid",
+					subjectAccount
+				)
+				
+			}
+		
+		} catch (Exception e) {
+			
+			e.printStackTrace(System.out)
+		
+			return new Response(
+				Constants.RESPONSE_TYPE_FAILURE,
+				"Error occured during transaction posting",
+				subjectAccount
+			)
+		}
+	
+	}
+	
+	Response postDeposit(FinancialAccount subjectAccount, Date transactionDate, BigDecimal amount, String modeOfPayment) {
+		
+		System.out.println("##### subjectAccount: " + subjectAccount);
+		
+		try {
+			
+			def sourceAccount = SystemAccount.findByTypeAndBranch(Constants.ACCOUNT_TYPE_BRANCH_CASH, subjectAccount.branch)
+				
+			if (!sourceAccount) {
+				return new Response(
+					Constants.RESPONSE_TYPE_FAILURE,
+					"Branch cash account is not configured. Transaction aborted.",
+					subjectAccount
+				)
+			}
+			
+			def targetAccount = subjectAccount
+			def txType = Constants.TX_TYPE_DEPOSIT
+			def paymentRef = ''
+			def narrative = modeOfPayment
+			def valueDate = transactionDate
+			
+			Response resp = transactionService.postTransaction(sourceAccount, targetAccount, amount, txType, paymentRef, narrative, valueDate)
+				
+			if (!resp.isSuccess()) {
+				return new Response (
+					Constants.RESPONSE_TYPE_FAILURE,
+					resp.message,
+					subjectAccount
+				)
+			}
+					
+			return new Response(
+				Constants.RESPONSE_TYPE_SUCCESS,
+				"Deposit posted successfully.",
+				subjectAccount
+			)
+			
+		} catch (Exception e) {
+				
+			e.printStackTrace(System.out)
+		
+			return new Response(
+				Constants.RESPONSE_TYPE_FAILURE,
+				"Error occured during transaction posting",
+				subjectAccount
+			)
+			
+		}
+		
+	}
+	
+	Response postWithdrawal(FinancialAccount subjectAccount, Date transactionDate, BigDecimal amount, String modeOfPayment) {
+		
+		try {
+			
+			def targetAccount = SystemAccount.findByTypeAndBranch(Constants.ACCOUNT_TYPE_BRANCH_CASH, subjectAccount.branch)
+				
+			if (!targetAccount) {
+				return new Response(
+					Constants.RESPONSE_TYPE_FAILURE,
+					"Branch cash account is not configured. Transaction aborted.",
+					subjectAccount
+				)
+			}
+			
+			def sourceAccount = subjectAccount
+			def txType = Constants.TX_TYPE_WITHDRAWAL
+			def paymentRef = ''
+			def narrative = modeOfPayment
+			def valueDate = transactionDate
+			
+			Response resp = transactionService.postTransaction(sourceAccount, targetAccount, amount, txType, paymentRef, narrative, valueDate)
+				
+			if (!resp.isSuccess()) {
+				return new Response (
+					Constants.RESPONSE_TYPE_FAILURE,
+					resp.message,
+					subjectAccount
+				)
+			}
+					
+			return new Response(
+				Constants.RESPONSE_TYPE_SUCCESS,
+				"Withdrawal posted successfully.",
+				subjectAccount
+			)
+			
+		} catch (Exception e) {
+				
+			e.printStackTrace(System.out)
+		
+			return new Response(
+				Constants.RESPONSE_TYPE_FAILURE,
+				"Error occured during transaction posting",
+				subjectAccount
+			)	
+			
+		}
+	}
+	
 }

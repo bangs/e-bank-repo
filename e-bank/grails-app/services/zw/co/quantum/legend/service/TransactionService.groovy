@@ -18,6 +18,18 @@ class TransactionService {
 		def transaction
 		
 		try {
+			
+			GLCode glCode = GLCode.findByType(transactionType)
+			
+			if (!glCode) {
+				
+				return new Response(
+					Constants.RESPONSE_TYPE_FAILURE,
+					'Transaction failed: No General Ledger code defined for this transaction',
+					transaction
+				)
+				
+			}
 		
 			transaction = new Transaction(
 				sourceAccountNo: sourceAccount.accountNumber, 
@@ -32,7 +44,7 @@ class TransactionService {
 				narrative: narrative ?: transactionType, 
 				valueDate: valueDate ?: new Date(),
 				reference: Config.getInstance().getNextTxReference().toString(),
-				gLCode: GLCode.findByType(transactionType)?.code,
+				gLCode: glCode.code,
 				initiator: User.get(springSecurityService.principal.id),
 				status: Constants.TX_STATUS_DRAFT
 			)

@@ -74,6 +74,8 @@ class BootStrap {
 		
 		assert new Role(authority: 'ROLE_REPORTER').save(flush: true)
 		
+		assert new Role(authority: 'ROLE_TELLER').save(flush: true)
+		
 		def user = new User(branch: branch, lastName: 'Admin', firstName: 'Admin', username: 'admin', password: 'admin', enabled: true).save(flush: true)
 		
 		assert user

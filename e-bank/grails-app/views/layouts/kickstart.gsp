@@ -109,7 +109,9 @@
 						<g:link action="list"><g:message code="default.list.label" args="[entityName]"/></g:link>
 					</li>
 					
-					<g:if test="${ params.controller != 'loanAccount' || (params.controller == 'loanAccount' && session.clientNo) }">
+					<g:if test="${ (params.controller != 'loanAccount' 
+							&& params.controller != 'savingsAccount')
+							|| session.clientNo }">
 						<li class="${ params.action == "create" ? 'active' : '' }">
 							<g:link action="create"><g:message code="default.new.label"  args="[entityName]"/></g:link>
 						</li>
@@ -133,6 +135,23 @@
 						<li class="${ params.action == 'applyPayment' ? 'active' : '' }">
 							<g:link action="applyPayment" id="${loanAccountInstance.id}">Apply Payment</g:link>
 						</li>
+					</g:if>
+					
+					<g:if test="${ params.controller == 'savingsAccount' 
+									&& (params.action == 'show' 
+											|| params.action == 'transactionHistory'
+											|| params.action == 'applyTransaction')
+								}">
+						<li class="${ params.action == 'show' ? 'active' : '' }">
+							<g:link action="show" id="${savingsAccountInstance.id}">Show Savings Account</g:link>
+						</li>
+						<li class="${ params.action == 'transactionHistory' ? 'active' : '' }">
+							<g:link action="transactionHistory" id="${savingsAccountInstance.id}">Transaction History</g:link>
+						</li>
+						<li class="${ params.action == 'applyTransaction' ? 'active' : '' }">
+							<g:link action="applyTransaction" id="${savingsAccountInstance.id}">Apply Transaction</g:link>
+						</li>
+		
 					</g:if>
 				
 				</g:if>

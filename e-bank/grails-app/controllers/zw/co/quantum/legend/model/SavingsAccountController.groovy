@@ -29,6 +29,12 @@ class SavingsAccountController {
     def save = {
         def savingsAccountInstance = new SavingsAccount(params)
 		
+		if (!session.clientNo) {
+			flash.message = 'No client selected'
+			render(view: "create", model: [savingsAccountInstance: savingsAccountInstance])
+			return
+		}
+		
 		savingsAccountInstance = clientService.populateClientInfo(savingsAccountInstance, session.clientNo)
 		
 		Response resp = accountService.registerAccount(savingsAccountInstance)  
@@ -159,6 +165,61 @@ class SavingsAccountController {
 			
 		render template:"listbody", model:[savingsAccountInstanceList: savingsAccountList, savingsAccountInstanceTotal: savingsAccountList?.size()]
 
+	}
+	
+	def transactionHistory() {
+		
+		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		
+		def savingsAccountInstance = SavingsAccount.get(params.id)
+		
+		def  postingInstanceList = Posting.findAllByAccountNumber(savingsAccountInstance.accountNumber)
+		
+		[ savingsAccountInstance: savingsAccountInstance, postingInstanceList: postingInstanceList, postingInstanceTotal: postingInstanceList?.size() ]
+		
+	}
+	
+	def applyTransaction() {
+		
+		[ savingsAccountInstance: SavingsAccount.get(params.id) ]
+		
+	}
+	
+	def postTransaction() {
+		
+		def savingsAccountInstance = SavingsAccount.get(params.id)
+		
+		System.out.println("%% savingsAccountInstance: " + savingsAccountInstance);
+		
+		try {
+			
+			Date transactionDate = params.transactionDate
+					
+			if (!params.amount) {
+				flash.message = 'Amount is not valid'
+				redirect(action: 'applyTransaction', id: params.id)
+				return
+			}
+			
+			Response resp = accountService.performTransaction(savingsAccountInstance, transactionDate, 
+																params.amount?.toBigDecimal(), params.paymentType, params.transactionType)
+			
+			flash.message = resp.message
+			
+			if (resp.isSuccess()) {
+				redirect(action:'show', id: savingsAccountInstance.id )
+			} else {
+				savingsAccountInstance = (SavingsAccount) resp.principal
+			redirect(action: 'applyTransaction', id: params.id)
+				return
+			}
+			
+		} catch (Exception e) {
+			flash.message = 'Error occured. One or more of the values you entered is/are invalid'
+			redirect(action: 'applyTransaction', id: params.id)
+			return
+		}
+						
 	}
 	
 }
